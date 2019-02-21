@@ -20,14 +20,14 @@ def read_data_vicon(num):
     return sio.loadmat("./vicon/viconRot" + str(num) + ".mat")
 
 bias_g = [371.3300, 374.7600, 376.2000]
-bias_a = [500,500, 500]
+bias_a = [511,500, 500]
 sens_a = 34.7455
-sens_g = 3.33
+sens_g = 300
 
 
 def convert_measurements(acc, gyro):
     acc_corr = (acc - bias_a)*3300/1023/sens_a
-    gyro_corr = (gyro - bias_g) * 3300 / 1023 * np.pi/180 /sens_g
+    gyro_corr = (gyro - bias_g) * 3300 / 1023 /sens_g
     return np.hstack((acc_corr, gyro_corr))
 
 
@@ -67,18 +67,18 @@ def estimate_rot(data_num=1):
         x, y, z = rotationMatrixToEulerAngles(vicon_data['rots'])
         # plt.plot(v_ts, x, 'r')
         plt.figure()
-        plt.plot(ts[1:], np.asarray(rpy)[:, 0])
         plt.plot(v_ts, x)
+        plt.plot(ts[1:], np.asarray(rpy)[:, 0])
         plt.figure()
-        plt.plot(ts[1:], np.asarray(rpy)[:, 1])
         plt.plot(v_ts, y)
+        plt.plot(ts[1:], np.asarray(rpy)[:, 1])
         plt.figure()
-        plt.plot(ts[1:], np.asarray(rpy)[:, 2])
         plt.plot(v_ts, z)
+        plt.plot(ts[1:], np.asarray(rpy)[:, 2])
         # plt.plot(v_ts, z, 'k')
         # for i in vicon_data
         plt.show()
-        print(rpy)
+        return rpy[:,0], rpy[:,1], rpy[:,2]
 
 
 if __name__ == '__main__':
