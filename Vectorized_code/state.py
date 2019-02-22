@@ -15,6 +15,7 @@ def acc_model(states):
     inv_states = copy.deepcopy(states[:,:4])
     inv_states[:,1:4] = -inv_states[:, 1:4]
     g_body = quat.multiply(quat.multiply(inv_states, g), states[:, :4])
+    # g_body = quat.multiply(quat.multiply(inv_states, g), states[:, :4])
     return g_body[:,1:4]
 
 def sensor_model(states):

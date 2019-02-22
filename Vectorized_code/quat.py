@@ -28,9 +28,14 @@ def multiply(q1, q2):
                             q_1[:,0]*q_2[:,3] + q_1[:,1]*q_2[:,2] - q_1[:,2]*q_2[:,1] + q_1[:,3]*q_2[:,0],))
 
 
+def rotmat2rpy(r):
+    norm = np.sqrt(r[2,1,:]**2 + r[2,2,:]**2)
+    roll_x = np.arctan(r[2,1,:]/r[2,2,:])
+    pitch_y = np.arctan(-r[2,0,:]/norm)
+    yaw_z = np.arctan(r[1,0,:]/r[0,0,:])
+    return [roll_x, pitch_y, yaw_z]
 
 def quat2rpy(q):
-    q = q / np.linalg.norm(q)
     sinr_cosp = +2.0 * (q[0] * q[1] + q[2] * q[3])
     cosr_cosp = +1.0 - 2.0 * (q[1] ** 2 + q[2] ** 2)
     roll = np.arctan2(sinr_cosp, cosr_cosp)
@@ -42,12 +47,25 @@ def quat2rpy(q):
         pitch = np.arcsin(sinp)
 
     siny_cosp = +2.0 * (q[0] * q[3] + q[1] * q[2])
-    cosy_cosp = +1.0 - 2.0 * (q[2] ** 2 + q[3] ** 2)
+    cosy_cosp = +1.0 - 2.0 * (q[2]**2 + q[3]**2)
     yaw = np.arctan2(siny_cosp, cosy_cosp)
-
     return [roll, pitch, yaw]
-
-
+def rotmat2rpy(r):
+    norm = np.sqrt(r[2,1]**2 + r[2,2]**2)
+    roll_x = np.arctan(r[2,1]/r[2,2])
+    pitch_y = np.arctan(-r[2,0]/norm)
+    yaw_z = np.arctan(r[1,0]/r[0,0])
+    return [roll_x, pitch_y, yaw_z]
+def quat2rotmat(q):
+    qhat = np.zeros([3,3])
+    qhat[0,1] = -q[:,3]
+    qhat[0,2] = q[:,2]
+    qhat[1,2] = -q[:,1]
+    qhat[1,0] = q[:,3]
+    qhat[2,0] = -q[:,2]
+    qhat[2,1] = q[:,1]
+    R = np.eye(3) + 2*np.dot(qhat, qhat) + 2*np.array(q[:,0])*qhat
+    return R
 def quat2vec(q):
     q = q/np.repeat(np.linalg.norm(q, axis=1)[:, np.newaxis], 4, axis=1)
     theta = 2 * np.arccos(q[:, 0])
