@@ -45,11 +45,14 @@ def convert_measurements(acc, gyro, data_num):
     sens_a = 330.0
     sf_a = 3300 / 1023.0 / sens_a
     # Make sure that the first point is [0,0,1]
-    if data_num in [1, 2, 3, 4, 5]:
+    if data_num in [1, 2, 3, 4]:
         bias_g = np.array([373.73, 375.6, 377])
         sens_g = 3.3
+    elif data_num == 5:
+        bias_g = np.array([373.73, 375.6, 367])
+        sens_g= 3.2
     else:
-        bias_g = np.array([373.64, 375.6, 364.4])
+        bias_g = np.array([373.73, 375.6, 364])
         sens_g = 3.2
     acc_scale_factor = 3300 / 1023.0 / sens_a
     acc_bias = acc[0, :] - (np.array([0, 0, 1]) / acc_scale_factor)
@@ -117,24 +120,23 @@ def estimate_rot(data_num=1):
         Knu = vec2quat(np.atleast_2d(np.dot(K, v )).T)
         curr_state = multiply(Knu.T, curr_state).reshape(4, )
         P = P - np.dot(np.dot(K, P_vv), np.transpose(K))
-        rpy.append(rotmat2rpy(quat2rotmat(curr_state)))
+        if data_num in [5, 6]:
+            #Atan2
+            rpy.append(quat2rpy(curr_state))
+        else:
+            # Atan
+            rpy.append(rotmat2rpy(quat2rotmat(curr_state)))
 
     rpy = np.array(rpy)
-    # rpy[-650:, 2] = 0
-    if data_num in [5, 6]:
-        roll = np.array(rpy[-2530 - 650:-650, 0])
-        pitch = np.array(rpy[-2530 - 650:-650, 1])
-        yaw = np.array(rpy[-2530 - 650:-650, 2])
-    else:
-        roll = np.array(rpy[:, 0])
-        pitch = np.array(rpy[:, 1])
-        yaw = np.array(rpy[:, 2])
+    roll = np.array(rpy[:, 0])
+    pitch = np.array(rpy[:, 1])
+    yaw = np.array(rpy[:, 2])
 
     return roll, pitch, yaw
 
 
 if __name__ == '__main__':
-    data_num = 1
+    data_num = 3
     t0 = time.time()
     r, p, y = estimate_rot(data_num)
     t1 = time.time()

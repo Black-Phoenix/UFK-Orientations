@@ -14,12 +14,6 @@ def quat_inv(q):
     return np.transpose(q_conj/np.sum(np.square(q_conj), axis=0))
 
 def multiply(q1, q2):
-    '''
-    Multiplies multiple quaternions with multiple one to one correspondence.
-    q1_internal - shape: (4,m) m-number of quaternions
-    q2_internal - shape: (4,m) m-number of quaternions
-    return q - shape (4,m)
-    '''
     q1_internal = np.transpose(np.atleast_2d(q1.copy()))
     q2_internal = np.transpose(np.atleast_2d(q2.copy()))
     m1, n1 = q1_internal.shape
@@ -31,14 +25,20 @@ def multiply(q1, q2):
 
 
 def quat2rpy(q):
-    q0 = q[0]
-    q1 = q[1]
-    q2 = q[2]
-    q3 = q[3]
-    r = np.arctan2(2*q2*q3 + 2*q0*q1, q3**2 - q2**2 - q1**2 + q0**2)
-    p = -np.arcsin(2*q1*q3 - 2*q0*q2)
-    y = np.arctan2(2*q1*q2 + 2*q0*q3, q1**2 + q0**2 - q3**2 - q2**2)
-    return r, p, y
+    sinr_cosp = +2.0 * (q[0] * q[1] + q[2] * q[3])
+    cosr_cosp = +1.0 - 2.0 * (q[1] ** 2 + q[2] ** 2)
+    roll = np.arctan2(sinr_cosp, cosr_cosp)
+
+    sinp = +2.0 * (q[0] * q[2] - q[3] * q[1])
+    if np.abs(sinp) >= 1:
+        pitch = np.copysign(np.pi / 2, sinp)  # ???
+    else:
+        pitch = np.arcsin(sinp)
+
+    siny_cosp = +2.0 * (q[0] * q[3] + q[1] * q[2])
+    cosy_cosp = +1.0 - 2.0 * (q[2]**2 + q[3]**2)
+    yaw = np.arctan2(siny_cosp, cosy_cosp)
+    return [roll, pitch, yaw]
 
 def vec2quat(w, del_t=1):
     w_internal = np.atleast_2d(w.copy())
@@ -90,4 +90,3 @@ def rotmat2rpy(r):
     pitch_y = np.arctan(-r[2,0]/norm)
     yaw_z = np.arctan(r[1,0]/r[0,0])
     return roll_x, pitch_y, yaw_z
-
