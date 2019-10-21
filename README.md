@@ -1,7 +1,14 @@
 # Orientation estimation
-![Roll 1](./imgs/4_dataset3/roll.png)
-![Pitch 1](./imgs/4_dataset3/pitch.png)
-![Roll 1](./imgs/4_dataset3/yaw.png)
+| Roll | Pitch | Yaw|
+| ----- | -------------------------------- | -------------------------------- |
+| ![Roll 1](./imgs/4_dataset3/roll.png) | ![Pitch 1](./imgs/4_dataset3/pitch.png) |   ![Roll 1](./imgs/4_dataset3/yaw.png)   |
+
+
+
+
+
+
+
 ## Overview
 This repostory estimates the orientation (roll, pitch and yaw) given IMU data using a unscented kalman filter. Ground truth was found out using a vicon mocap setup.
 ## Dependencies
